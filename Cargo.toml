@@ -1,0 +1,8 @@
+[package]
+name = "rust-triangles"
+version = "0.1.0"
+authors = ["Matt 961 <matt961@protonmail.ch>"]
+
+[dependencies]
+petgraph = "0.4.12"
+rayon = "1.0.1"
