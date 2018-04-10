@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn test_read_fb_graph() {
-        let mut dir_reader = fs::read_dir("testres/just_artists/").unwrap();
+        let mut dir_reader = fs::read_dir("testres/").unwrap();
         let g = read_fb_graph(&mut dir_reader);
         println!("|V| = {} and |E| = {}", g.node_count(), g.edge_count());
     }

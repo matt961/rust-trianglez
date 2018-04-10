@@ -3,25 +3,10 @@ use petgraph::prelude::UnGraphMap;
 
 use std::collections::HashMap;
 use std::collections::hash_map::Iter;
-use std::time::SystemTime;
 
 use std::fmt::Debug;
 
-#[derive(Debug)]
-pub struct Triangle<N: NodeTrait> {
-    pub nodes: (N, N, N),
-}
-
-impl<N: NodeTrait> Triangle<N> {
-    pub fn new(start: N, first: N, second: N) -> Triangle<N> {
-        let mut v = &[start, first, second];
-        v.sort();
-        let (one, two, three) = v;
-        Triangle {
-            nodes: (one, two, three),
-        }
-    }
-}
+pub struct Triangle<N: NodeTrait>(N, N);
 
 pub struct TriangleFinder<N: NodeTrait> {
     local_triangles: HashMap<N, Vec<Triangle<N>>>,
@@ -29,23 +14,23 @@ pub struct TriangleFinder<N: NodeTrait> {
 
 impl<N: NodeTrait + Debug> TriangleFinder<N> {
     pub fn find_triangles<E>(g: &UnGraphMap<N, E>) -> TriangleFinder<N> {
-        TriangleFinder {
-            local_triangles: g.nodes()
-                .map(|start| {
-                    (
-                        start,
+        let mut triangles = HashMap::new();
+        for start in g.nodes() {
+            triangles.insert(
+                start,
+                g.neighbors(start)
+                    .enumerate()
+                    .flat_map(|(skip, first)| {
                         g.neighbors(start)
-                            .enumerate()
-                            .flat_map(|(skip, first)| {
-                                g.neighbors(start)
-                                    .skip(skip + 1)
-                                    .filter(move |second| g.contains_edge(first, *second))
-                                    .map(move |second| Triangle::new(start, first, second))
-                            })
-                            .collect(),
-                    )
-                })
-                .collect(),
+                            .skip(skip + 1)
+                            .filter(move |second| g.contains_edge(first, *second))
+                            .map(move |second| Triangle(first, second))
+                    })
+                    .collect(),
+            );
+        }
+        TriangleFinder {
+            local_triangles: triangles,
         }
     }
 
