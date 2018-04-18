@@ -1,11 +1,11 @@
 use csv::Reader;
-use petgraph::prelude::*;
+use graph::Graph;
 use std::collections::hash_map::DefaultHasher;
 use std::fs;
 use std::hash::{Hash, Hasher};
 
-pub fn read_fb_graph(dir: &mut fs::ReadDir) -> UnGraphMap<u64, ()> {
-    let mut g = GraphMap::new();
+pub fn read_fb_graph<'a>(dir: &'a mut fs::ReadDir) -> Graph<String> {
+    let mut g = Graph::new();
     while let Some(Ok(dir_entry)) = dir.next() {
         let pb = dir_entry.path();
         let path = pb.as_path();
@@ -28,20 +28,11 @@ pub fn read_fb_graph(dir: &mut fs::ReadDir) -> UnGraphMap<u64, ()> {
                             id2.push_str(category);
                             // println!("id1 = {} and id2 = {}", id1, id2);
 
-                            let mut h = DefaultHasher::new();
-
-                            id1.hash(&mut h);
-                            let node1 = h.finish();
-
-                            h = DefaultHasher::new();
-                            id2.hash(&mut h);
-                            let node2 = h.finish();
-
-                            if node1 == node2 {
+                            if id1 == id2 {
                                 continue;
                             }
 
-                            g.add_edge(node1, node2, ());
+                            g.add_edge(id1, id2);
                         }
                     }
                 }
@@ -53,7 +44,7 @@ pub fn read_fb_graph(dir: &mut fs::ReadDir) -> UnGraphMap<u64, ()> {
 
 #[cfg(test)]
 mod tests {
-    use super::read_fb_graph;
+    use super::*;
 
     use std::fs;
 

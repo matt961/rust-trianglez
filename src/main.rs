@@ -1,10 +1,10 @@
 #![feature(duration_extras)]
 extern crate csv;
-extern crate petgraph;
 extern crate rayon;
 
-mod trianglez;
+mod graph;
 mod readers;
+mod trianglez;
 
 use std::time::Instant;
 
@@ -13,10 +13,6 @@ use std::fs;
 use trianglez::TriangleFinder;
 
 fn main() {
-    bench_big_graph();
-}
-
-fn bench_big_graph() {
     let mut dir_reader = fs::read_dir("testres/").unwrap();
     let g = read_fb_graph(&mut dir_reader);
     println!("|V| = {} and |E| = {}", g.node_count(), g.edge_count());
@@ -24,7 +20,7 @@ fn bench_big_graph() {
     let time = Instant::now();
     let tf = TriangleFinder::find_triangles(&g);
     println!("Getting triangle count...");
-    let count: usize = tf.get_local_triangles().map(|t_arr| t_arr.1.len()).sum();
+    let count: usize = tf.get_local_triangles().count();
     println!("Elapsed time {}s", time.elapsed().as_secs());
     println!("found {} triangles.", count);
     //println!("Number of triangles = {}", count);
