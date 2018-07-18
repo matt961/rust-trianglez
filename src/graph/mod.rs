@@ -19,10 +19,7 @@ pub struct Graph<N: Node>
 	adj_list: HashMap<N, AdjacencyList<N>>,
 }
 
-impl<N> Graph<N>
-where
-	N: Node
-{
+impl<N: Node> Graph<N> {
 	pub fn new() -> Graph<N> {
 		Graph {
 			adj_list: HashMap::new(),
@@ -45,11 +42,11 @@ where
 		}
 	}
 
-	pub fn nodes_par(&self) -> Vec<&N> {
-		self.adj_list.keys().collect()
+	pub fn nodes_par(&self) -> impl ParallelIterator<Item=&N> {
+		self.adj_list.par_iter().map(|(key, _)| key)
 	}
 
-	pub fn nodes(&self) -> Keys<N, AdjacencyList<N>> {
+	pub fn nodes(&self) -> impl Iterator<Item=&N> {
 		self.adj_list.keys()
 	}
 
