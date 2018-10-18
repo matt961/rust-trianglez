@@ -16,10 +16,19 @@ fn main() {
     let mut dir_reader = fs::read_dir("testres/").unwrap();
     let g = read_fb_graph(&mut dir_reader);
     println!("|V| = {} and |E| = {}", g.node_count(), g.edge_count());
-    println!("Finding triangles and counting them all...");
+
+    println!("Finding triangles and counting them all...sequentially");
+    let time = Instant::now();
+    let tf = TriangleFinder::find_triangles(&g);
+    println!("Getting triangle count...");
+    println!("found {} triangles.", tf.count());
+    println!("Elapsed time {}s", time.elapsed().as_secs());
+
+    println!("Finding triangles and counting them all...in parallel");
     let time = Instant::now();
     let tf = TriangleFinder::find_triangles_par(&g);
     println!("Getting triangle count...");
     println!("found {} triangles.", tf.count());
     println!("Elapsed time {}s", time.elapsed().as_secs());
+
 }

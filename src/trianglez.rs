@@ -21,13 +21,8 @@ impl TriangleFinder {
                         g.neighbors(start)
                             .unwrap()
                             .skip(skip + 1)
-                            .filter_map(move |second| {
-                                if g.contains_edge(first, second) { 
-                                    Some(Triangle(start, first, second))
-                                } else { 
-                                    None 
-                                }
-                            })
+                            .filter(move |second| g.contains_edge(&first, &second))
+                            .map(move |second| Triangle(start, first, second))
                     })
             })
     }
@@ -43,7 +38,7 @@ impl TriangleFinder {
                         .skip(skip + 1)
                         .filter(move |second| g.contains_edge(&first, &second))
                         .map(move |second| Triangle(start, first, second))
-                }).collect::<Vec<_>>().into_par_iter()
+                }).par_bridge()
         })
     }
 }
