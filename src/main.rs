@@ -9,7 +9,7 @@ use std::time::Instant;
 
 use readers::read_fb_graph;
 use std::fs;
-use trianglez::TriangleFinder;
+use trianglez::{SeqTriangleFinder, ParTriangleFinder};
 use rayon::prelude::*;
 
 fn main() {
@@ -18,8 +18,15 @@ fn main() {
     println!("|V| = {} and |E| = {}", g.node_count(), g.edge_count());
     println!("Finding triangles and counting them all...");
     let time = Instant::now();
-    let tf = TriangleFinder::find_triangles_par(&g);
+    let tf = SeqTriangleFinder::find_triangles(&g);
     println!("Getting triangle count...");
     println!("found {} triangles.", tf.count());
-    println!("Elapsed time {}s", time.elapsed().as_secs());
+    let elapsed = time.elapsed();
+    println!("Elapsed time {}s {}us", elapsed.as_secs(), elapsed.subsec_nanos());
+    let time = Instant::now();
+    println!("Doing Par now...");
+    let tf_par = ParTriangleFinder::find_triangles(&g);
+    let elapsed = time.elapsed();
+    println!("Elapsed time {}s {}us", elapsed.as_secs(), elapsed.subsec_nanos());
+    println!("found {} triangles.", tf_par.count());
 }
